@@ -8,16 +8,17 @@ This repository contains the code and resources associated with the research pap
 In particular:
 
 * Script <tt>1_estimation_trenord_od_matrices.R</tt> develops the code needed to estimate weekly OD matrices in the Trenord network, given ticket and counter data.
-* Script <tt>2_comparison_trenord_rl_od_data.R</tt> compares the dynamic Trenord OD matrices with a publicly available static OD matrix represent movements during an average workday of year 2020 in the Lombardy region.
+* Script <tt>2_comparison_trenord_rl_od_data.R</tt> compares the dynamic Trenord OD matrices with a publicly available static OD matrix representing movements during an average workday of the year 2020 in the Lombardy region.
 * Script <tt>3_dynamics_network_analysis.R</tt> applies some techniques of network and functional data analysis to perform anomaly detection in the temporal weighted directed network induced by the Trenord dynamic OD matrices.
 
-Moreover, script <tt>Data_visualization.R</tt> produce all the plots needed to interpret the analyses' results.
+Moreover, script <tt>Data_visualization.R</tt> produces all the plots needed to interpret the analyses' results.
 
 The code is developed in R (version 4.2.1).
 
 ## Data and Resources
+All data should be placed into folder <tt>Data</tt>.
 
-The Trenord data about tickets sold and passenger counts in 2022 is not available due to confidentiality agreements. If available, they should be placed into the directory <tt>Data/Trenord</tt>
+The Trenord data about tickets sold and passenger counts in 2022 is unavailable due to confidentiality agreements. If available, they should be placed into the directory <tt>Data/Trenord</tt>
 
 Due to the substantial size of the datasets required for the analyses, data must be downloaded and placed in specific locations as indicated in the following table:
 
