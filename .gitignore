@@ -1,0 +1,9 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+
+Data/Trenord/
+Data/ISTAT/
+Data/RegioneLombardia/
+Plots/

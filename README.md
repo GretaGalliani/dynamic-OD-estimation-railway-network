@@ -1,2 +1,37 @@
 # dynamic-OD-estimation-railway-network
-code associated to my paper "Estimation of dynamic Origin-Destination matrices in a railway transportation network integrating ticket sales and passenger count data"
+Code associated to the paper "Estimation of dynamic Origin-Destination matrices in a railway transportation network integrating ticket sales and passenger count data" authored by Greta Galliani, Piercesare Secchi, and Francesca Ieva
+
+## Overview
+
+This repository contains the code and resources associated with the research paper titled **Estimation of dynamic Origin-Destination matrices in a railway transportation network integrating ticket sales and passenger count data** authored by Greta Galliani, Piercesare Secchi, and Francesca Ieva.
+
+In particular:
+
+* Script <tt>1_estimation_trenord_od_matrices.R</tt> develops the code needed to estimate weekly OD matrices in the Trenord network, given ticket and counter data.
+* Script <tt>2_comparison_trenord_rl_od_data.R</tt> compares the dynamic Trenord OD matrices with a publicly available static OD matrix represent movements during an average workday of year 2020 in the Lombardy region.
+* Script <tt>3_dynamics_network_analysis.R</tt> applies some techniques of network and functional data analysis to perform anomaly detection in the temporal weighted directed network induced by the Trenord dynamic OD matrices.
+
+Moreover, script <tt>Data_visualization.R</tt> produce all the plots needed to intepret the analyses' results.
+
+The code is developed in R (version 4.2.1).
+
+## Data and Resources
+
+The Trenord data about tickets sold and passenger counts in 2022 is not available due to confidentiality agreements. 
+
+Due to the substantial size of the datasets required for the analyses, data must be downloaded and placed in specific locations as indicated in the following table:
+
+| Description | Link | Location |
+|-------------|------|----------|
+| Istat codes of Italian municipalities at 2022-01-01 | [Link](https://www.istat.it/storage/codici-unita-amministrative/Archivio-elenco-comuni-codici-e-denominazioni_Anni_2022-2023.zip) | Data/ISTAT/istat_codes_2022.xls |
+| Suppressed municipalities in Italy | [Link](https://www.istat.it/it/archivio/6789) |  Data/ISTAT/suppressed_municipalities.xls |
+| Data about road distances from every municipality in Lombardia to every other Italian municipality | [Link](https://www.istat.it/storage/cartografia/matrici_distanze/Lombardia.zip) | Data/ISTAT/Lombardia_distances.txt |
+| Data about road distances from every municipality in Veneto to every other Italian municipality | [Link](https://www.istat.it/storage/cartografia/matrici_distanze/Veneto.zip) | Data/ISTAT/Veneto_distances.txt |
+| 2020 OD matrix released by Regione Lombardia | [Link](https://www.dati.lombardia.it/Mobilit-e-trasporti/Matrice-OD2020-Passeggeri/hyqr-mpe2/data) | Data/RegioneLombardia/matriceOD_lombardia_2020.csv |
+
+
+## Citation
+
+If you use this code or data in your work, please consider citing the original paper authored by Greta Galliani, Piercesare Secchi, and Francesca Ieva. 
+
+For further details about the research and its findings, please refer to the associated paper.
