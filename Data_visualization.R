@@ -44,7 +44,7 @@ if (!dir.exists("Plots/OD_estimation")) dir.create("Plots/OD_estimation", recurs
 if (!dir.exists("Plots/OD_estimation/Tickets")) dir.create("Plots/OD_estimation/Tickets", recursive = TRUE)
 #### Tickets by week divided by types ----
 # Importing ticket datasets
-tickets <- read.csv("Data/Trenord/Original/ticket_data_2022.csv", sep=";")
+tickets <- read.csv("Data/Trenord/element_text(sizeticket_data_2022.csv", sep=";")
 
 # I preprocess tickets
 tickets <- clean_tickets(tickets, station_codes)
@@ -303,7 +303,7 @@ rm(OD_cur, OD_cur_p, OD_tickets, p1, temp)
 if (!dir.exists("Plots/OD_estimation/Counters")) dir.create("Plots/OD_estimation/Counters", recursive = TRUE)
 
 # load counter data 
-train_count <- read.csv("Data/Trenord/Original/counter_data_2022.csv", sep = ";")
+train_count <- read.csv("Data/Trenord/element_text(sizecounter_data_2022.csv", sep = ";")
 
 # Adjust dates
 train_count$Data.missione <- as.Date(train_count$Data.missione, "%Y/ %m/ %d")

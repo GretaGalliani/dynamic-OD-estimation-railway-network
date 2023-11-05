@@ -61,7 +61,7 @@ save(list = c("station_codes","Milan_area", "IS_area", "Verona"), file = "Data/T
 
 ## COMPUTE THE MEAN TRAVEL TIME FOR EVERY LINE AND EVERY DIRECT OD PATH
 # Load timetable data
-train_count <- read.csv("Data/Trenord/Original/counter_data_2022.csv", sep = ";")
+train_count <- read.csv("Data/Trenord/counter_data_2022.csv", sep = ";")
 
 # Estimation of times
 for (line in lines){
@@ -102,7 +102,7 @@ rm(Travel_times, Direct_paths)
 # of the study 
 
 # Loading counter data
-train_count <- read.csv("Data/Trenord/Original/counter_data_2022.csv", sep = ";")
+train_count <- read.csv("Data/Trenord/counter_data_2022.csv", sep = ";")
 
 # Weeks of the study are
 weeks <- unique(sort(as.character(format(as.Date(train_count$Data.missione), "%Y_%W"))))
@@ -152,7 +152,7 @@ rm(Filled_Marg)
 
 #### CONVERSION OF TICKETS INTO ESTIMATED TRIPS ----
 # Importing ticket datasets
-tickets <- read.csv("Data/Trenord/Original/ticket_data_2022.csv", sep=";")
+tickets <- read.csv("Data/Trenord/ticket_data_2022.csv", sep=";")
 
 # I preprocess tickets
 tickets <- clean_tickets(tickets, station_codes)
