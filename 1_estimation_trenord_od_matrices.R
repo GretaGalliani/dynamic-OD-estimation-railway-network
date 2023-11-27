@@ -4,56 +4,39 @@ rm(list = ls())
 source("utils.R")
 set.seed(24091998)
 
-## Load stations
-stations <- read.csv("Data/Trenord/stations_processed.csv")
-
-# Correct some municipality names in the dataset
-stations$Nome <- str_to_title(tolower(stations$Nome))
-stations$Nome[which(stations$Nome == "Albano S.alessandro")] <- "Albano S. Alessandro"
-stations$Nome[which(stations$Nome == "Cassano D'adda")] <- "Cassano D'Adda"
-stations$Nome[which(stations$Nome == "Desenzano Del Garda-Sirmione")] <- "Desenzano del Garda - Sirmione"
-stations$Nome[which(stations$Nome == "Grumello Del Monte")] <- "Grumello del Monte"
-stations$Nome[which(stations$Nome == "Palazzolo Sull'oglio")] <- "Palazzolo sull'Oglio"
-stations$Nome[which(stations$Nome == "Peschiera Del Garda")] <- "Peschiera del Garda"
-stations$Nome[which(stations$Nome == "Ponte S.pietro")] <- "Ponte S. Pietro"
-stations$Nome[which(stations$Nome == "Sesto S.giovanni")] <- "Sesto S. Giovanni"
-
 # Stations belong to 6 train lines
-# R1, R2, R4, R14, RE2, RE6
-lines = c("R1","R2","R4","R14","RE_2","RE_6")
+lines = c("L1","L2","L3","L4","L5","L6")
 
-R1_stations <- c("S01717", "S01716", "S01714", "S01540", "S01539", "S01538", "S01537", "S01536", "S01535",
-                 "S01534", "S01533", "S01529")
-R2_stations <- c("S01529", "S01612", "S01611", "S01600", "S01608", "S01601", "S01708")
-R4_stations <- c("S01717", "S01716", "S01714", "S01713", "S01712", "S01711", "S01710", "S01709", "S01708",
-                 "S01707", "S01706", "S01722", "S01705", "S01704", "S01703", "S01701", "S01326")
-R14_stations <- c("S01645", "S01326", "S01325", "S01322", "S01510", "S01511", "S01502", "S01503", "S01504",
-                  "S01528", "S01530", "S01529")
-RE2_stations <- c("S01645", "S01639", "S01700", "S01326", "S01701", "S01703", "S01600", "S01529")
-RE6_stations <- c("S01700", "S01701", "S01703", "S01708", "S01711", "S01713", "S01714", "S01717", "S02084", 
-                  "S02088", "S02430")
+L1_stations <- c("S178", "S240", "S273", "S304", "S366", "S389", "S430", "S506", "S547", "S632", "S744", 
+                 "S859")
+L2_stations <- c("S070", "S085", "S095", "S106", "S154", "S228", "S276", "S547", "S551", "S635", "S685", "S742")
+L3_stations <- c("S320", "S547", "S621", "S648", "S651", "S856", "S875")
+L4_stations <- c("S025", "S163", "S304", "S414", "S478", "S549", "S625", "S630", "S632", "S661", "S685",
+                 "S760", "S767", "S787", "S820", "S859", "S875")
+L5_stations <- c("S179", "S276", "S281", "S320", "S414", "S547", "S549", "S685")
+L6_stations <- c("S179", "S221", "S414", "S423", "S478", "S549", "S632", "S799", "S820", "S859", "S875")
 
 stations_list_lines <- hash() 
-stations_list_lines[["R1"]] <- R1_stations
-stations_list_lines[["R2"]] <- R2_stations
-stations_list_lines[["R4"]] <- R4_stations
-stations_list_lines[["R14"]] <- R14_stations
-stations_list_lines[["RE_2"]] <- RE2_stations
-stations_list_lines[["RE_6"]] <- RE6_stations
+stations_list_lines[["L1"]] <- L1_stations
+stations_list_lines[["L2"]] <- L2_stations
+stations_list_lines[["L3"]] <- L3_stations
+stations_list_lines[["L4"]] <- L4_stations
+stations_list_lines[["L5"]] <- L5_stations
+stations_list_lines[["L6"]] <- L6_stations
 
-station_codes <- unique(c(R1_stations, R2_stations, R4_stations, R14_stations, RE2_stations, RE6_stations))
+station_codes <- unique(c(L1_stations, L2_stations, L3_stations, L4_stations, L5_stations, L6_stations))
 
-# Define the code of station Verona Porta Nuova
-Verona <- "S02430"
-# Define the codes of stations in Milan
-Milan_area <- c("S01326", "S01639", "S01645", "S01700", "S01701")
-# Define the codes of stations in the Integrated Subscriptions area
-IS_area <- c("S01322", "S01325", "S01326", "S01510", "S01511", "S01639", "S01645", "S01700", "S01701", "S01703",
-             "S01704", "S01705", "S01706", "S01707", "S01722")
+# Define the code of stations with missing data
+missing_data_station <- "S799"
+# Define the codes of stations in the same municipality
+city_area <- c("S179", "S276", "S281", "S549", "S685")
+# Define the codes of stations in the missing data area
+missing_data_area <- c("S025", "S070", "S106", "S163", "S179", "S228", "S276", "S281", "S414", "S549",
+                       "S661", "S685", "S742", "S760", "S767")
 
 # Save
 if (!dir.exists("Data/Trenord/Processed")) dir.create("Data/Trenord/Processed", recursive = TRUE)
-save(list = c("station_codes","Milan_area", "IS_area", "Verona"), file = "Data/Trenord/Processed/station_codes.Rdata")
+save(list = c("station_codes","city_area", "missing_data_area", "missing_data_station"), file = "Data/Trenord/Processed/station_codes.Rdata")
 
 #### ESTIMATION OF TRAVEL TIMES ----
 # We build estimates of travel times, considering direct paths and paths requiring at most one change of train, 
@@ -61,7 +44,10 @@ save(list = c("station_codes","Milan_area", "IS_area", "Verona"), file = "Data/T
 
 ## COMPUTE THE MEAN TRAVEL TIME FOR EVERY LINE AND EVERY DIRECT OD PATH
 # Load timetable data
-train_count <- read.csv("Data/Trenord/counter_data_2022.csv", sep = ";")
+train_count <- read.csv("Data/Trenord/train.csv")
+train_count <- train_count |>
+  mutate_at(vars(TrainCode, Line, DepartureStation, ArrivalStation, StopStation), as.character)
+
 
 # Estimation of times
 for (line in lines){
@@ -69,7 +55,7 @@ for (line in lines){
   mat_times <- generate_travel_time_matrix_direct(line, line_stations, train_count)
   
   if (!dir.exists("Data/Trenord/Processed/Travel_times")) dir.create("Data/Trenord/Processed/Travel_times", recursive = TRUE)
-  write.csv(mat_times, paste0("Data/Trenord/Processed/Travel_times/Mat_times", line, ".csv"), row.names = F)
+  write.csv(mat_times, paste0("Data/Trenord/Processed/Travel_times/mat_times_", line, ".csv"), row.names = F)
 }
 rm(train_count, mat_times)
 
@@ -77,7 +63,7 @@ rm(train_count, mat_times)
 # Load all the time matrices for the 6 train lines
 mat_times <- NULL 
 for (line in lines){
-  line_mat_times <- read.csv(paste0("Data/Trenord/Processed/Travel_times/mat_times", line, ".csv"))
+  line_mat_times <- read.csv(paste0("Data/Trenord/Processed/Travel_times/mat_times_", line, ".csv"))
   mat_times <- rbind(mat_times, line_mat_times)
 }
 
@@ -102,16 +88,16 @@ rm(Travel_times, Direct_paths)
 # of the study 
 
 # Loading counter data
-train_count <- read.csv("Data/Trenord/counter_data_2022.csv", sep = ";")
+train_count <- read.csv("Data/Trenord/train.csv")
 
 # Weeks of the study are
-weeks <- unique(sort(as.character(format(as.Date(train_count$Data.missione), "%Y_%W"))))
+weeks <- unique(sort(as.character(format(as.Date(train_count$MissionDate), "%Y_%W"))))
 # I remove partial weeks 
 weeks <- weeks[-c(1,length(weeks))]
 
 ## BUILDING MARGINAL MATRIX
 # I count, for every week and stations, the number of boarded and dropped passengers considering only VALID data
-# i.e., counter states in (0,1,2,3,4)
+# i.e., counter states in (1)
 Marg <- build_marg(station_codes, train_count, weeks)
 
 # Saving marginal 
@@ -127,7 +113,7 @@ Coverage <- build_coverage(station_codes, train_count, weeks)
 write.csv(Coverage, "Data/Trenord/Processed/Marginals/coverage.csv", row.names = FALSE)
 rm(Coverage)
 
-## RESTIMATION OF MISSING COUNTERS DATA
+## ESTIMATION OF MISSING COUNTERS DATA
 # load Marg data
 Marg <- read.csv("Data/Trenord/Processed/Marginals/partial_marginals.csv")
 
@@ -152,7 +138,7 @@ rm(Filled_Marg)
 
 #### CONVERSION OF TICKETS INTO ESTIMATED TRIPS ----
 # Importing ticket datasets
-tickets <- read.csv("Data/Trenord/ticket_data_2022.csv", sep=";")
+tickets <- read.csv("Data/Trenord/ticket.csv")
 
 # I preprocess tickets
 tickets <- clean_tickets(tickets, station_codes)
@@ -190,7 +176,7 @@ OD_tickets <- read.csv("Data/Trenord/Processed/Seeds/OD_seeds_step2.csv")
 Marg <- read.csv("Data/Trenord/Processed/Marginals/marginals_filled.csv")
 
 # Prepare dataset for the application of the gravity model
-df <- build_gravity_model_dataset(OD_tickets, Travel_times, Marg, Verona, IS_area, Milan_area)
+df <- build_gravity_model_dataset(OD_tickets, Travel_times, Marg, missing_data_station, missing_data_area, city_area)
 rm(OD_tickets, Travel_times, Marg)
 
 # Fit the gravity model and use it to predict missing ticket-estimated OD data 
