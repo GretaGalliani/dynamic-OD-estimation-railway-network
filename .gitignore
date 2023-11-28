@@ -1,0 +1,8 @@
+.Rproj.user
+.Rhistory
+.RData
+*.Rproj
+.Ruserdata
+Data/**
+Plots/**
+
