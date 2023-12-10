@@ -1,11 +1,7 @@
-.Rproj.user
-.Rhistory
-.RData
+*.DS_Store
+*.Rproj
+*.Rhistory
+*.Rproj.user
 .Ruserdata
-.Rproj
-.DS_Store
-
-Data/Trenord/
-Data/ISTAT/
-Data/RegioneLombardia/
-Plots/
+Data/Processed/**
+Plots/**

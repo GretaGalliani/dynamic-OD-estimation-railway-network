@@ -35,8 +35,8 @@ missing_data_area <- c("S025", "S070", "S106", "S163", "S179", "S228", "S276", "
                        "S661", "S685", "S742", "S760", "S767")
 
 # Save
-if (!dir.exists("Data/Trenord/Processed")) dir.create("Data/Trenord/Processed", recursive = TRUE)
-save(list = c("station_codes","city_area", "missing_data_area", "missing_data_station"), file = "Data/Trenord/Processed/station_codes.Rdata")
+if (!dir.exists("Data/Processed")) dir.create("Data/Processed", recursive = TRUE)
+save(list = c("station_codes","city_area", "missing_data_area", "missing_data_station"), file = "Data/Processed/station_codes.Rdata")
 
 #### ESTIMATION OF TRAVEL TIMES ----
 # We build estimates of travel times, considering direct paths and paths requiring at most one change of train, 
@@ -44,7 +44,7 @@ save(list = c("station_codes","city_area", "missing_data_area", "missing_data_st
 
 ## COMPUTE THE MEAN TRAVEL TIME FOR EVERY LINE AND EVERY DIRECT OD PATH
 # Load timetable data
-train_count <- read.csv("Data/Trenord/train.csv")
+train_count <- read.csv("Data/train.csv")
 train_count <- train_count |>
   mutate_at(vars(TrainCode, Line, DepartureStation, ArrivalStation, StopStation), as.character)
 
@@ -54,8 +54,8 @@ for (line in lines){
   line_stations <- stations_list_lines[[line]]
   mat_times <- generate_travel_time_matrix_direct(line, line_stations, train_count)
   
-  if (!dir.exists("Data/Trenord/Processed/Travel_times")) dir.create("Data/Trenord/Processed/Travel_times", recursive = TRUE)
-  write.csv(mat_times, paste0("Data/Trenord/Processed/Travel_times/mat_times_", line, ".csv"), row.names = F)
+  if (!dir.exists("Data/Processed/Travel_times")) dir.create("Data/Processed/Travel_times", recursive = TRUE)
+  write.csv(mat_times, paste0("Data/Processed/Travel_times/mat_times_", line, ".csv"), row.names = F)
 }
 rm(train_count, mat_times)
 
@@ -63,7 +63,7 @@ rm(train_count, mat_times)
 # Load all the time matrices for the 6 train lines
 mat_times <- NULL 
 for (line in lines){
-  line_mat_times <- read.csv(paste0("Data/Trenord/Processed/Travel_times/mat_times_", line, ".csv"))
+  line_mat_times <- read.csv(paste0("Data/Processed/Travel_times/mat_times_", line, ".csv"))
   mat_times <- rbind(mat_times, line_mat_times)
 }
 
@@ -76,11 +76,11 @@ rm(mat_times)
 
 ## FOR EVERY OD PAIR NOT CONNECTED BY A LINE, FIND THE OPTIMAL CHANGING STATION AND THE MEAN TRAVEL TIME 
 Travel_times <- generate_travel_time_matrix(station_codes, direct_times)
-write.csv(Travel_times, "Data/Trenord/Processed/Travel_times/total_travel_times.csv", row.names = F)
+write.csv(Travel_times, "Data/Processed/Travel_times/total_travel_times.csv", row.names = F)
 
 # Finally, generate the matrix representing the direct travel paths in the network, to be used in the the next steps
 Direct_paths <- generate_direct_paths_matrix(Travel_times, station_codes)
-write.csv(Direct_paths, "Data/Trenord/Processed/Travel_times/direct_paths.csv", row.names = F)
+write.csv(Direct_paths, "Data/Processed/Travel_times/direct_paths.csv", row.names = F)
 rm(Travel_times, Direct_paths)
 
 #### COUNTER DATA AGGREGATION AND ESTIMATION OF MISSING DATA ----
@@ -88,7 +88,7 @@ rm(Travel_times, Direct_paths)
 # of the study 
 
 # Loading counter data
-train_count <- read.csv("Data/Trenord/train.csv")
+train_count <- read.csv("Data/train.csv")
 
 # Weeks of the study are
 weeks <- unique(sort(as.character(format(as.Date(train_count$MissionDate), "%Y_%W"))))
@@ -101,8 +101,8 @@ weeks <- weeks[-c(1,length(weeks))]
 Marg <- build_marg(station_codes, train_count, weeks)
 
 # Saving marginal 
-if (!dir.exists("Data/Trenord/Processed/Marginals")) dir.create("Data/Trenord/Processed/Marginals", recursive = TRUE)
-write.csv(Marg, "Data/Trenord/Processed/Marginals/partial_marginals.csv", row.names = FALSE)
+if (!dir.exists("Data/Processed/Marginals")) dir.create("Data/Processed/Marginals", recursive = TRUE)
+write.csv(Marg, "Data/Processed/Marginals/partial_marginals.csv", row.names = FALSE)
 rm(Marg)
 
 ## COVERAGE COMPUTATION
@@ -110,21 +110,21 @@ rm(Marg)
 # of trains, for each week and station
 Coverage <- build_coverage(station_codes, train_count, weeks)
 
-write.csv(Coverage, "Data/Trenord/Processed/Marginals/coverage.csv", row.names = FALSE)
+write.csv(Coverage, "Data/Processed/Marginals/coverage.csv", row.names = FALSE)
 rm(Coverage)
 
 ## ESTIMATION OF MISSING COUNTERS DATA
 # load Marg data
-Marg <- read.csv("Data/Trenord/Processed/Marginals/partial_marginals.csv")
+Marg <- read.csv("Data/Processed/Marginals/partial_marginals.csv")
 
 # load Coverage data 
-Cov <- read.csv("Data/Trenord/Processed/Marginals/coverage.csv")
+Cov <- read.csv("Data/Processed/Marginals/coverage.csv")
 rm(train_count)
 
 ## DATA PREPARATION
 # I prepare the dataset to fill the missing marginal data
 to_fill_df <- prepare_filling_dataset(station_codes, weeks, Cov, Marg)
-write.csv(to_fill_df, "Data/Trenord/Processed/Marginals/to_fill_marginals.csv", row.names = FALSE)
+write.csv(to_fill_df, "Data/Processed/Marginals/to_fill_marginals.csv", row.names = FALSE)
 rm(Cov, Marg)
 
 ## FILLING THE MISSING DATA
@@ -133,12 +133,12 @@ Filled_Marg <- filling_missing_marg_data(to_fill_df, station_codes, weeks)
 rm(to_fill_df)
 
 # Saving the result
-write.csv(Filled_Marg, "Data/Trenord/Processed/Marginals/marginals_filled.csv", row.names = FALSE)
+write.csv(Filled_Marg, "Data/Processed/Marginals/marginals_filled.csv", row.names = FALSE)
 rm(Filled_Marg)
 
 #### CONVERSION OF TICKETS INTO ESTIMATED TRIPS ----
 # Importing ticket datasets
-tickets <- read.csv("Data/Trenord/ticket.csv")
+tickets <- read.csv("Data/ticket.csv")
 
 # I preprocess tickets
 tickets <- clean_tickets(tickets, station_codes)
@@ -152,28 +152,28 @@ rm(tickets, dates_tickets)
 OD <- postprocess_tickets(OD, station_codes)
 
 # Save result
-if (!dir.exists("Data/Trenord/Processed/Seeds")) dir.create("Data/Trenord/Processed/Seeds", recursive = TRUE)
-write.csv(OD, "Data/Trenord/Processed/Seeds/OD_seeds_step1.csv", row.names = FALSE)
+if (!dir.exists("Data/Processed/Seeds")) dir.create("Data/Processed/Seeds", recursive = TRUE)
+write.csv(OD, "Data/Processed/Seeds/OD_seeds_step1.csv", row.names = FALSE)
 rm(OD)
 
 #### SEPARATION OF TRIPS REQUIRING AT MOST ONE CHANGE OF TRAIN ----
 # Load ticket-estimated OD matrix
-OD_tickets <- read.csv("Data/Trenord/Processed/Seeds/OD_seeds_step1.csv")
+OD_tickets <- read.csv("Data/Processed/Seeds/OD_seeds_step1.csv")
 
 # Load travel times dataset
-Travel_times <- read.csv("Data/Trenord/Processed/Travel_times/total_travel_times.csv")
+Travel_times <- read.csv("Data/Processed/Travel_times/total_travel_times.csv")
 
 # 1. Remove trips requiring more than one change of train
 # 2. Separate the trips requiring one change of train in the optimal station (i.e. station achieving the minimum travel time)
 OD_tickets <- separate_trips(OD_tickets, Travel_times)
-write.csv(OD_tickets, "Data/Trenord/Processed/Seeds/OD_seeds_step2.csv", row.names = FALSE)
+write.csv(OD_tickets, "Data/Processed/Seeds/OD_seeds_step2.csv", row.names = FALSE)
 rm(Travel_times, OD_tickets)
 
 #### ESTIMATION OF MISSING TICKET OD DATA THORUGH GRAVITY MODEL ----
 # Load data 
-Travel_times <- read.csv("Data/Trenord/Processed/Travel_times/total_travel_times.csv")
-OD_tickets <- read.csv("Data/Trenord/Processed/Seeds/OD_seeds_step2.csv")
-Marg <- read.csv("Data/Trenord/Processed/Marginals/marginals_filled.csv")
+Travel_times <- read.csv("Data/Processed/Travel_times/total_travel_times.csv")
+OD_tickets <- read.csv("Data/Processed/Seeds/OD_seeds_step2.csv")
+Marg <- read.csv("Data/Processed/Marginals/marginals_filled.csv")
 
 # Prepare dataset for the application of the gravity model
 df <- build_gravity_model_dataset(OD_tickets, Travel_times, Marg, missing_data_station, missing_data_area, city_area)
@@ -182,18 +182,18 @@ rm(OD_tickets, Travel_times, Marg)
 # Fit the gravity model and use it to predict missing ticket-estimated OD data 
 OD_tickets <- gravity_model_estimation(df)
 rm(df)
-write.csv(OD_tickets, "Data/Trenord/Processed/Seeds/OD_seeds_step3.csv", row.names = FALSE)
+write.csv(OD_tickets, "Data/Processed/Seeds/OD_seeds_step3.csv", row.names = FALSE)
 
 #### FURNESS METHOD ----
 # The final step is the application of the Furness method for every week of the study period
 # Load ticket OD seed
-OD_tickets <- read.csv("Data/Trenord/Processed/Seeds/OD_seeds_step3.csv")
+OD_tickets <- read.csv("Data/Processed/Seeds/OD_seeds_step3.csv")
 
 # Load marginals
-Marg <- read.csv("Data/Trenord/Processed/Marginals/marginals_filled.csv")
+Marg <- read.csv("Data/Processed/Marginals/marginals_filled.csv")
 
 # Load Direct paths data, needed to identify direct paths
-Direct_paths <- read.csv("Data/Trenord/Processed/Travel_times/direct_paths.csv")
+Direct_paths <- read.csv("Data/Processed/Travel_times/direct_paths.csv")
 
 # The weeks are
 weeks <- sort(unique(Marg$Week))
@@ -202,7 +202,7 @@ weeks <- sort(unique(Marg$Week))
 X <- build_Furness_OD_matrices(OD_tickets, Marg, Direct_paths, station_codes, weeks)
 
 # Saving the results
-if (!dir.exists("Data/Trenord/Processed/IPF")) dir.create("Data/Trenord/Processed/IPF", recursive = TRUE)
-write.csv(X$Errors, "Data/Trenord/Processed/IPF/IPF_errors.csv", row.names = FALSE)
-write.csv(X$OD_Furness, "Data/Trenord/Processed/IPF/OD_Trenord_IPF.csv", row.names = FALSE)
+if (!dir.exists("Data/Processed/IPF")) dir.create("Data/Processed/IPF", recursive = TRUE)
+write.csv(X$Errors, "Data/Processed/IPF/IPF_errors.csv", row.names = FALSE)
+write.csv(X$OD_Furness, "Data/Processed/IPF/OD_Trenord_IPF.csv", row.names = FALSE)
 rm(X, Marg, OD_tickets)

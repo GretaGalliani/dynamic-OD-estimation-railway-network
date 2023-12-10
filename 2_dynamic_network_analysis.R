@@ -10,12 +10,12 @@ library(roahd)
 library(fdacluster)
 
 # Load network
-OD <- read.csv("Data/Trenord/Processed/IPF/OD_Trenord_IPF.csv")
+OD <- read.csv("Data/Processed/IPF/OD_Trenord_IPF.csv")
 
 # Load stations codes
-load("Data/Trenord/Processed/station_codes.Rdata")
+load("Data/Processed/station_codes.Rdata")
 
-if (!dir.exists("Data/Trenord/Processed/Dynamic_network_analysis")) dir.create("Data/Trenord/Processed/Dynamic_network_analysis", recursive = TRUE)
+if (!dir.exists("Data/Processed/Dynamic_network_analysis")) dir.create("Data/Processed/Dynamic_network_analysis", recursive = TRUE)
 
 ####  1. GLOBAL METRICS ----
 #### 1.1. Global comparison between matrices through RMSE-----
@@ -45,7 +45,7 @@ Diff_norm$Week <- as.Date(unlist(lapply(Diff_norm$Week, function(x) {
   return(as.character(as.Date(paste(x, 1, sep="_"), "%Y_%W_%w")))})))
   
 # Saving the result
-write.csv(Diff_norm, "Data/Trenord/Processed/Dynamic_network_analysis/global_MSE.csv", row.names = FALSE)
+write.csv(Diff_norm, "Data/Processed/Dynamic_network_analysis/global_MSE.csv", row.names = FALSE)
 
 #### 1.2. Mean Strength -----
 strength <- expand.grid(Week = weeks, Station = station_codes) |> 
@@ -82,14 +82,14 @@ strength <- strength |>
          Strength_in_norm = Strength_in / Total_in,
          Strength_out_norm = Strength_out / Total_out) |>
   dplyr::select(-c(Total_all, Total_in, Total_out))
-write.csv(strength, "Data/Trenord/Processed/Dynamic_network_analysis/strength.csv", row.names = FALSE)
+write.csv(strength, "Data/Processed/Dynamic_network_analysis/strength.csv", row.names = FALSE)
 
 # I compute the mean streght in the network
 mean_strength <- strength |> dplyr::select(-c(Strength_all_norm,Strength_in_norm,Strength_out_norm))|> group_by(Week) |> 
   summarise(across(where(is.numeric), ~ sum(.x, na.rm = TRUE)))
 
 # Saving the result
-write.csv(mean_strength, "Data/Trenord/Processed/Dynamic_network_analysis/mean_strength.csv", row.names = FALSE)
+write.csv(mean_strength, "Data/Processed/Dynamic_network_analysis/mean_strength.csv", row.names = FALSE)
 
 
 #### 2. LOCAL METRICS  ----
@@ -153,7 +153,7 @@ st_func_df$Week <- as.Date(unlist(lapply(st_func_df$Week, function(x) {
 st_func_df <- st_func_df |> pivot_longer(cols = colnames(st_func_df)[1:46], names_to = 'Station', values_to = 'y')
 
 # Saving the result
-write.csv(st_func_df, "Data/Trenord/Processed/Dynamic_network_analysis/local_strength_function.csv", row.names = FALSE)
+write.csv(st_func_df, "Data/Processed/Dynamic_network_analysis/local_strength_function.csv", row.names = FALSE)
 
 # Plot the functional mean
 fd_strength <- Data2fd(y = t(as.matrix(st_df[,-1])),argvals = t,basisobj = basis)
@@ -187,4 +187,4 @@ outliers
 st_func_df$out_group <- 'Normal'
 st_func_df[st_func_df$Station %in% outliers, "out_group"] <- 'Outlier'
 
-write.csv(st_func_df, "Data/Trenord/Processed/Dynamic_network_analysis/functional_outliers.csv", row.names = F)
+write.csv(st_func_df, "Data/Processed/Dynamic_network_analysis/functional_outliers.csv", row.names = F)

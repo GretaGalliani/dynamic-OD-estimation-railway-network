@@ -764,13 +764,6 @@ gravity_model_estimation <- function(df){
   to_add <- to_pred |> select(Start, End, Week, Counts_pred) |> rename(Counts = Counts_pred)
   OD_tickets <- rbind(OD_tickets, to_add)
   
-  # Travel_times <- read.csv("Data/Trenord/Processed/NEW/2022/Travel_times/Total_travel_times.csv")
-  # X <- OD_tickets |> left_join(Travel_times, by = c("Start", "End")) # CHECK -> Only 0, so no indirect paths
-  
-  # X <- OD_tickets |> full_join(Travel_times, by = c("Start", "End"))
-  # Y <- X |> filter(Optimal.change.station == 0 & is.na(Counts)) # CHECK -> empty, so all the direct paths have a number in OD tickets
-  # # OK, I checked that OD tickets now contains ONLY direct paths
-  
   # I need to recompose the ticket OD matrix
   OD_tickets <- OD_tickets |> pivot_wider(
     names_from = "Week",

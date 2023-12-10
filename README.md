@@ -15,9 +15,7 @@ Moreover, script <tt>data_visualization.R</tt> produces all the plots needed to 
 The code is developed in R (version 4.2.1).
 
 ## Data and Resources
-All data should be placed into folder <tt>Data</tt>.
-
-The Trenord data about tickets sold and passenger counts in 2022 is unavailable due to confidentiality agreements. If available, they should be placed into the directory <tt>Data/Trenord</tt>
+Due to confidentiality agreements, the Trenord data about tickets sold and passenger counts in 2022 is unavailable. We produced two artificial datasets, <tt>ticket.csv</tt> and <tt>train.csv</tt> for demonstrative purposes, which, however, have no relationship with the actual data about railway movements in the Trenord railway network in 2022.
 
 ## Citation
 
