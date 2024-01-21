@@ -19,7 +19,7 @@ pal <- brewer.pal(12, "Set3")
 palx <- c(pal,pal)
 display.brewer.pal(12, "Set3")
 
-load("Data/Trenord/Processed/station_codes.Rdata")
+load("Data/Processed/station_codes.Rdata")
 source("utils.R")
 
 if (!dir.exists("Plots")) dir.create("Plots", recursive = TRUE)
@@ -30,7 +30,7 @@ if (!dir.exists("Plots/OD_estimation")) dir.create("Plots/OD_estimation", recurs
 if (!dir.exists("Plots/OD_estimation/Tickets")) dir.create("Plots/OD_estimation/Tickets", recursive = TRUE)
 #### Tickets by week divided by types ----
 # Importing ticket datasets
-ticket <- read.csv("Data/Trenord/ticket.csv", colClasses = c(rep("character", 4), "numeric"))
+ticket <- read.csv("Data/ticket.csv", colClasses = c(rep("character", 4), "numeric"))
 
 # I preprocess tickets
 ticket <- clean_tickets(ticket, station_codes)
@@ -67,7 +67,7 @@ rm(ticket, p2, paln)
 
 #### OD ticket-estimated matrices - step 1 (after tickets conversion into estimated trips) ----
 # Load tickets
-OD_tickets <- read.csv("Data/Trenord/Processed/Seeds/OD_seeds_step1.csv", header=TRUE)
+OD_tickets <- read.csv("Data/Processed/Seeds/OD_seeds_step1.csv", header=TRUE)
 
 # Generate weeks
 weeks <- colnames(OD_tickets)[3:dim(OD_tickets)[2]]
@@ -121,7 +121,7 @@ rm(OD_cur, OD_cur_p, OD_tickets, p1)
 
 #### OD ticket-estimated matrices - step 2 (after separation of trips) ----
 # Load tickets
-OD_tickets <- read.csv("Data/Trenord/Processed/Seeds/OD_seeds_step2.csv", header=TRUE)
+OD_tickets <- read.csv("Data/Processed/Seeds/OD_seeds_step2.csv", header=TRUE)
 
 # Generate weeks
 weeks <- colnames(OD_tickets)[3:dim(OD_tickets)[2]]
