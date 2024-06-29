@@ -86,7 +86,7 @@ write.csv(strength, "Data/Processed/Dynamic_network_analysis/strength.csv", row.
 
 # I compute the mean streght in the network
 mean_strength <- strength |> dplyr::select(-c(Strength_all_norm,Strength_in_norm,Strength_out_norm))|> group_by(Week) |> 
-  summarise(across(where(is.numeric), ~ sum(.x, na.rm = TRUE)))
+  summarise(across(where(is.numeric), ~ mean(.x, na.rm = TRUE)))
 
 # Saving the result
 write.csv(mean_strength, "Data/Processed/Dynamic_network_analysis/mean_strength.csv", row.names = FALSE)
