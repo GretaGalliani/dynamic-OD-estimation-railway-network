@@ -10,8 +10,6 @@ In particular:
 * Script <tt>1_estimation_trenord_od_matrices.R</tt> develops the code needed to estimate weekly OD matrices in the Trenord network, given ticket and counter data.
 * Script <tt>2_dynamics_network_analysis.R</tt> applies some techniques of network and functional data analysis to perform anomaly detection in the temporal weighted directed network induced by the Trenord dynamic OD matrices.
 
-Moreover, script <tt>data_visualization.R</tt> produces all the plots needed to interpret the analyses' results.
-
 The code is developed in R (version 4.2.1).
 
 ## Data and Resources

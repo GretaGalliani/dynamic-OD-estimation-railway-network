@@ -16,7 +16,7 @@ library(mipfp)
 
 #### ESTIMATION OF TRAVEL TIMES ----
 # Function to compute the mean travel time between two stations s1 (origin) and s2 (destination) of the same line using data collected in train_count
-mean_travel_time <- function(s1, s2, line, train_count){
+mean_travel_time <- function(s1, s2, line, train_count, q_low, q_high){
   # Generate travel code keeping account of the day to match trains
   train_count$Mycode <- paste0(as.Date(as.Date(train_count$MissionDate), format = "%d_%m"), train_count$TrainCode)
   
@@ -33,13 +33,13 @@ mean_travel_time <- function(s1, s2, line, train_count){
   times <- set1 |> filter(Mycode %in% unique(set2$Mycode)) |> full_join(set2, by = "Mycode") |> filter(StopIndex.end > StopIndex.start) |>
     mutate(Travel.time = as.numeric(difftime(as.POSIXct(Time.end, format="%Y-%m-%d %H:%M:%S"), as.POSIXct(Time.start, format="%Y-%m-%d  %H:%M:%S"), units = "mins"))) |>
     # Remove difference in times outside of the IQR range since I want to account for normal situations
-    filter(Travel.time <= quantile(Travel.time, 0.95, na.rm = T) & Travel.time >= quantile(Travel.time, 0.05, na.rm = T))
+    filter(Travel.time <= quantile(Travel.time, q_high, na.rm = T) & Travel.time >= quantile(Travel.time, q_low, na.rm = T))
   
   return(mean(times$Travel.time))
 }
 
 # Function to generate the matrix of travel times for a line, given its stations line_stations and data about train rides in train_count
-generate_travel_time_matrix_direct <- function(line, line_stations, train_count){
+generate_travel_time_matrix_direct <- function(line, line_stations, train_count, q_low, q_high){
   # For all the station pairs in the line
   station_pairs <- expand.grid(Start = line_stations, End = line_stations) %>%
     filter(Start != End)
@@ -47,7 +47,7 @@ generate_travel_time_matrix_direct <- function(line, line_stations, train_count)
   # Compute the mean travel time using function mean_travel_time
   mat_times <- station_pairs %>%
     mutate(Mean.travel.time = mapply(
-      function(s1, s2) mean_travel_time(s1, s2, line, train_count),
+      function(s1, s2) mean_travel_time(s1, s2, line, train_count, q_low, q_high),
       Start, End
     )) |>
     # Eliminate NA values. NOTE: NA happens when some stations are not connected in the line. Lines R4 and RE_2 have some stations with this behavior

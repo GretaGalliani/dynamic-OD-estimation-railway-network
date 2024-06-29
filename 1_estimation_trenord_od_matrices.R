@@ -52,7 +52,7 @@ train_count <- train_count |>
 # Estimation of times
 for (line in lines){
   line_stations <- stations_list_lines[[line]]
-  mat_times <- generate_travel_time_matrix_direct(line, line_stations, train_count)
+  mat_times <- generate_travel_time_matrix_direct(line, line_stations, train_count, 0.05, 0.95)
   
   if (!dir.exists("Data/Processed/Travel_times")) dir.create("Data/Processed/Travel_times", recursive = TRUE)
   write.csv(mat_times, paste0("Data/Processed/Travel_times/mat_times_", line, ".csv"), row.names = F)
