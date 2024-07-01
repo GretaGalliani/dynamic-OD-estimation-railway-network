@@ -36,7 +36,7 @@ for (i in 2:length(weeks)){
   OD_cur <- OD_week(OD, w_cur, station_codes)
   
   # Computing the RMSE
-  Diff_norm[Diff_norm$Week == w_cur, "RMSE"] <- sqrt(sum((OD_cur - OD_prev)^2) / length(OD_cur))
+  Diff_norm[Diff_norm$Week == w_cur, "RMSE"] <- sqrt(sum((OD_cur - OD_prev)^2) / length(OD_cur)^2)
 }
 
 Diff_norm$Week <- as.Date(unlist(lapply(Diff_norm$Week, function(x) {
@@ -45,7 +45,7 @@ Diff_norm$Week <- as.Date(unlist(lapply(Diff_norm$Week, function(x) {
   return(as.character(as.Date(paste(x, 1, sep="_"), "%Y_%W_%w")))})))
   
 # Saving the result
-write.csv(Diff_norm, "Data/Processed/Dynamic_network_analysis/global_MSE.csv", row.names = FALSE)
+write.csv(Diff_norm, "Data/Processed/Dynamic_network_analysis/global_RMSE.csv", row.names = FALSE)
 
 #### 1.2. Mean Strength -----
 strength <- expand.grid(Week = weeks, Station = station_codes) |> 
